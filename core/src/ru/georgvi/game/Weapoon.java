@@ -1,19 +1,21 @@
 package ru.georgvi.game;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class Weapoon {
-    private Texture texture;
+    private TextureRegion texture;
     private float firePeriod;
     private  int damage;
 
-    public Weapoon() {
-        this.texture = new Texture("simple_weapon.png");
+    public Weapoon(TextureAtlas atlas) {
+        this.texture = atlas.findRegion("simpleWeapon");
         this.firePeriod = 0.3f;
         this.damage = 1;
     }
 
-    public Texture getTexture() {
+    public TextureRegion getTexture() {
         return texture;
     }
 
