@@ -3,14 +3,19 @@ package ru.georgvi.game.units;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import ru.georgvi.game.MyGdxGame;
 import ru.georgvi.game.Weapoon;
+import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
 
 public class PlayerTank extends Tank {
+
+    int score;
 
     int lives;
 
@@ -33,17 +38,13 @@ public class PlayerTank extends Tank {
 
     public void checkMovement(float dt) {
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            position.x -= speed * dt;
-            angle = 180.0f;
+            move(Direction.LEFT, dt);
         } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            position.x += speed * dt;
-            angle = 0.0f;
+            move(Direction.RIGTH, dt);
         } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            position.y -= speed * dt;
-            angle = 270.0f;
+            move(Direction.DOWN, dt);
         } else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            position.y += speed * dt;
-            angle = 90.0f;
+            move(Direction.UP, dt);
         }
     }
 
@@ -53,9 +54,17 @@ public class PlayerTank extends Tank {
         float my = Gdx.graphics.getHeight() - Gdx.input.getY();
         rotateTurretToPoint(mx, my, dt);
         if (Gdx.input.isTouched()) {
-            fire(dt);
+            fire();
         }
         super.update(dt);
+    }
+
+    public void addScore(int amount) {
+        score += amount;
+    }
+
+    public void renderHUD(SpriteBatch batch, BitmapFont font24) {
+        font24.draw(batch, "Score: " + score + "\nLifes: " + lives, 20, 700);
     }
 
     @Override

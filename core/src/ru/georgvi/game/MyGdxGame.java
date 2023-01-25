@@ -2,9 +2,15 @@ package ru.georgvi.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import ru.georgvi.game.units.BotTank;
 import ru.georgvi.game.units.PlayerTank;
@@ -13,11 +19,13 @@ import ru.georgvi.game.units.Tank;
 
 public class MyGdxGame extends ApplicationAdapter {
     private SpriteBatch batch;
+    private BitmapFont font24;
     private Map map;
     private PlayerTank player;
     private BulletEmitter bulletEmitter;
     private BotEmitter botEmitter;
     private float gameTimer;
+    private Stage stage;
 
     public static final boolean FRIENDLY_FIRE = false;
 
@@ -32,14 +40,33 @@ public class MyGdxGame extends ApplicationAdapter {
     @Override
     public void create() {
         TextureAtlas textureAtlas = new TextureAtlas("game.pack");
+        font24 = new BitmapFont(Gdx.files.internal("font24.fnt"));
         batch = new SpriteBatch();
         map = new Map(textureAtlas);
         player = new PlayerTank(this, textureAtlas);
         bulletEmitter = new BulletEmitter(textureAtlas);
         botEmitter = new BotEmitter(this, textureAtlas);
-        botEmitter.acvate(MathUtils.random(0, Gdx.graphics.getWidth()), MathUtils.random(0, Gdx.graphics.getHeight()));
-
+        float coordX, coordY;
+        do {
+            coordX = MathUtils.random(0, Gdx.graphics.getWidth());
+            coordY = MathUtils.random(0, Gdx.graphics.getHeight());
+        } while (!map.isAreaClear(coordX, coordY, 20));
+        botEmitter.acvate(coordX, coordY);
+        stage = new Stage();
+        Skin skin = new Skin();
+        skin.add("simpleButton", textureAtlas.findRegion("simpleButton"));
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = skin.getDrawable("simpleButton");
+        textButtonStyle.font = font24;
+        TextButton pauseButton = new TextButton("Pause", textButtonStyle);
+        pauseButton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
+            }
+        });
     }
+
 
     @Override
     public void render() {
@@ -51,6 +78,7 @@ public class MyGdxGame extends ApplicationAdapter {
         player.render(batch);
         botEmitter.render(batch);
         bulletEmitter.render(batch);
+        player.renderHUD(batch, font24);
         batch.end();
     }
 
@@ -58,7 +86,14 @@ public class MyGdxGame extends ApplicationAdapter {
         gameTimer += dt;
         if (gameTimer > 5.0f) {
             gameTimer = 0.0f;
-            botEmitter.acvate(MathUtils.random(0, Gdx.graphics.getWidth()), MathUtils.random(0, Gdx.graphics.getHeight()));
+
+            float coordX, coordY;
+
+            do {
+                coordX = MathUtils.random(0, Gdx.graphics.getWidth());
+                coordY = MathUtils.random(0, Gdx.graphics.getHeight());
+            } while (!map.isAreaClear(coordX, coordY, 20));
+            botEmitter.acvate(coordX, coordY);
         }
         player.update(dt);
         botEmitter.update(dt);
@@ -97,6 +132,10 @@ public class MyGdxGame extends ApplicationAdapter {
         } else {
             return tank != bullet.getOwner();
         }
+    }
+
+    public Map getMap() {
+        return map;
     }
 
     @Override

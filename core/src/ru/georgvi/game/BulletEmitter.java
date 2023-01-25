@@ -24,10 +24,10 @@ public class BulletEmitter {
         return bullets;
     }
 
-    public void acvate(Tank owner, float x, float y, float vx, float vy, int damage) {
+    public void acvate(Tank owner, float x, float y, float vx, float vy, int damage, float maxTime) {
         for (int i = 0; i < bullets.length; i++) {
             if (!bullets[i].isActive()) {
-                bullets[i].activate(owner,x, y, vx, vy, damage);
+                bullets[i].activate(owner,x, y, vx, vy, damage, maxTime);
                 break;
             }
         }

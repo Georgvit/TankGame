@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import ru.georgvi.game.MyGdxGame;
+import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
 import ru.georgvi.game.utils.Utils;
 import ru.georgvi.game.Weapoon;
@@ -15,6 +16,7 @@ public abstract class Tank {
     protected TankOwner ownerType;
     protected Weapoon weapoon;
     protected Vector2 position;
+    protected Vector2 temp;
     protected TextureRegion texture;
     protected TextureRegion textureHp;
     protected Circle circle;
@@ -39,7 +41,9 @@ public abstract class Tank {
     }
 
     public Tank(MyGdxGame game) {
+
         this.game = game;
+        this.temp = new Vector2(0.0f, 0.0f);
     }
 
     public void render(SpriteBatch batch) {
@@ -74,7 +78,16 @@ public abstract class Tank {
         circle.setPosition(position);
     }
 
-    ;
+    public void move(Direction direction, float dt) {
+        temp.set(position);
+        temp.add(speed * direction.getVx() * dt, speed * direction.getVy() * dt);
+        float dist = this.position.dst(game.getPlayer().getPosition());
+
+        if (game.getMap().isAreaClear(temp.x, temp.y, width / 2)) {
+            angle = direction.getAngle();
+            position.set(temp);
+        }
+    }
 
     public void rotateTurretToPoint(float pointX, float pointY, float dt) {
         float angleTo = Utils.getAngle(position.x, position.y, pointX, pointY);
@@ -85,12 +98,13 @@ public abstract class Tank {
     //    Движение танка по стрелкам
 
 
-    public void fire(float dt) {
+    public void fire() {
         if (fireTimer >= weapoon.getFirePeriod()) {
             fireTimer = 0.0f;
             float angleRad = (float) Math.toRadians(angleTurret);
-            game.getBulletEmitter().acvate(this, position.x, position.y, 320.0f * (float) Math.cos(angleRad),
-                    320.0f * (float) Math.sin(angleRad), weapoon.getDamage());
+            float projectSpeed = 320.0f;
+            game.getBulletEmitter().acvate(this, position.x, position.y, weapoon.getProjectileSpeed() * (float) Math.cos(angleRad),
+                    weapoon.getProjectileSpeed() * (float) Math.sin(angleRad), weapoon.getDamage(), weapoon.getProjectileLifetime());
 
         }
 
