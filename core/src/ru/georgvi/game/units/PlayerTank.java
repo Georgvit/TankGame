@@ -2,13 +2,13 @@ package ru.georgvi.game.units;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
-import ru.georgvi.game.MyGdxGame;
+import ru.georgvi.game.GameScreen;
+import ru.georgvi.game.ScreenManager;
 import ru.georgvi.game.Weapoon;
 import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
@@ -19,14 +19,14 @@ public class PlayerTank extends Tank {
 
     int lives;
 
-    public PlayerTank(MyGdxGame game, TextureAtlas atlas) {
+    public PlayerTank(GameScreen game, TextureAtlas atlas) {
         super(game);
-        this.game = game;
+        this.gameScreen = game;
         this.ownerType = TankOwner.PLAYER;
         this.weapoon = new Weapoon(atlas);
         this.texture = atlas.findRegion("playerTankBase");
         this.textureHp = atlas.findRegion("bar");
-        this.position = new Vector2(100.0f, 100.0f);
+        this.position = new Vector2(100.0f, 200.0f);
         this.speed = 102.0f;
         this.width = texture.getRegionWidth();
         this.height = texture.getRegionHeight();
@@ -50,9 +50,11 @@ public class PlayerTank extends Tank {
 
     public void update(float dt) {
         checkMovement(dt);
-        float mx = Gdx.input.getX();
-        float my = Gdx.graphics.getHeight() - Gdx.input.getY();
-        rotateTurretToPoint(mx, my, dt);
+//        float mx = Gdx.input.getX();
+//        float my = Gdx.graphics.getHeight() - Gdx.input.getY();
+        temp.set(Gdx.input.getX(), Gdx.input.getY());
+        ScreenManager.getInstance().getViewport().unproject(temp);
+        rotateTurretToPoint(temp.x, temp.y, dt);
         if (Gdx.input.isTouched()) {
             fire();
         }
@@ -64,7 +66,7 @@ public class PlayerTank extends Tank {
     }
 
     public void renderHUD(SpriteBatch batch, BitmapFont font24) {
-        font24.draw(batch, "Score: " + score + "\nLifes: " + lives, 20, 700);
+        font24.draw(batch, "Счет: " + score + "\nЖизни: " + lives, 50, 53);
     }
 
     @Override

@@ -1,13 +1,11 @@
 package ru.georgvi.game.units;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import ru.georgvi.game.MyGdxGame;
+import ru.georgvi.game.GameScreen;
 import ru.georgvi.game.Weapoon;
 import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
@@ -24,9 +22,9 @@ public class BotTank extends Tank {
         return active;
     }
 
-    public BotTank(MyGdxGame game, TextureAtlas atlas) {
+    public BotTank(GameScreen game, TextureAtlas atlas) {
         super(game);
-        this.game = game;
+        this.gameScreen = game;
         this.ownerType = TankOwner.AI;
         this.weapoon = new Weapoon(atlas);
         this.texture = atlas.findRegion("botTankBase");
@@ -53,9 +51,9 @@ public class BotTank extends Tank {
             angle = prefereDirection.getAngle();
         }
         move(prefereDirection, dt);
-        float dist = this.position.dst(game.getPlayer().getPosition());
+        float dist = this.position.dst(gameScreen.getPlayer().getPosition());
         if (dist < pursuitRadius) {
-            rotateTurretToPoint(game.getPlayer().getPosition().x, game.getPlayer().getPosition().y, dt);
+            rotateTurretToPoint(gameScreen.getPlayer().getPosition().x, gameScreen.getPlayer().getPosition().y, dt);
             fire();
         }
         if (Math.abs(position.x - lastPosition.x) < 0.5f && Math.abs(position.y - lastPosition.y) < 0.5f) {

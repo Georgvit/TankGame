@@ -5,14 +5,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
-import ru.georgvi.game.MyGdxGame;
+import ru.georgvi.game.GameScreen;
 import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
 import ru.georgvi.game.utils.Utils;
 import ru.georgvi.game.Weapoon;
 
 public abstract class Tank {
-    protected MyGdxGame game;
+    protected GameScreen gameScreen;
     protected TankOwner ownerType;
     protected Weapoon weapoon;
     protected Vector2 position;
@@ -40,9 +40,9 @@ public abstract class Tank {
         this.speed = speed;
     }
 
-    public Tank(MyGdxGame game) {
+    public Tank(GameScreen gameScreen) {
 
-        this.game = game;
+        this.gameScreen = gameScreen;
         this.temp = new Vector2(0.0f, 0.0f);
     }
 
@@ -81,9 +81,9 @@ public abstract class Tank {
     public void move(Direction direction, float dt) {
         temp.set(position);
         temp.add(speed * direction.getVx() * dt, speed * direction.getVy() * dt);
-        float dist = this.position.dst(game.getPlayer().getPosition());
+        float dist = this.position.dst(gameScreen.getPlayer().getPosition());
 
-        if (game.getMap().isAreaClear(temp.x, temp.y, width / 2)) {
+        if (gameScreen.getMap().isAreaClear(temp.x, temp.y, width / 2)) {
             angle = direction.getAngle();
             position.set(temp);
         }
@@ -103,7 +103,7 @@ public abstract class Tank {
             fireTimer = 0.0f;
             float angleRad = (float) Math.toRadians(angleTurret);
             float projectSpeed = 320.0f;
-            game.getBulletEmitter().acvate(this, position.x, position.y, weapoon.getProjectileSpeed() * (float) Math.cos(angleRad),
+            gameScreen.getBulletEmitter().acvate(this, position.x, position.y, weapoon.getProjectileSpeed() * (float) Math.cos(angleRad),
                     weapoon.getProjectileSpeed() * (float) Math.sin(angleRad), weapoon.getDamage(), weapoon.getProjectileLifetime());
 
         }
@@ -117,6 +117,7 @@ public abstract class Tank {
     public Vector2 getPosition() {
         return position;
     }
+
 
     public void takeDamage(int damage) {
         hp -= damage;

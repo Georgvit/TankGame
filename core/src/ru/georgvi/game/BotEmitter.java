@@ -1,6 +1,5 @@
 package ru.georgvi.game;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import ru.georgvi.game.units.BotTank;
@@ -10,7 +9,7 @@ public class BotEmitter {
 
     public static final int MAX_BOTS_COUNT = 100;
 
-    public BotEmitter(MyGdxGame game, TextureAtlas atlas) {
+    public BotEmitter(GameScreen game, TextureAtlas atlas) {
         this.bots = new BotTank[MAX_BOTS_COUNT];
         for (int i = 0; i < bots.length; i++) {
             this.bots[i] = new BotTank(game, atlas);
