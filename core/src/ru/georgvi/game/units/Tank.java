@@ -81,7 +81,7 @@ public abstract class Tank {
     public void move(Direction direction, float dt) {
         temp.set(position);
         temp.add(speed * direction.getVx() * dt, speed * direction.getVy() * dt);
-        float dist = this.position.dst(gameScreen.getPlayer().getPosition());
+//        float dist = this.position.dst(gameScreen.getPlayers().getPosition());
 
         if (gameScreen.getMap().isAreaClear(temp.x, temp.y, width / 2)) {
             angle = direction.getAngle();

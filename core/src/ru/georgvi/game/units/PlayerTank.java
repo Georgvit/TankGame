@@ -8,19 +8,20 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import ru.georgvi.game.GameScreen;
-import ru.georgvi.game.ScreenManager;
 import ru.georgvi.game.Weapoon;
 import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
 
 public class PlayerTank extends Tank {
+    int index;
 
     int score;
 
     int lives;
 
-    public PlayerTank(GameScreen game, TextureAtlas atlas) {
+    public PlayerTank(int index, GameScreen game, TextureAtlas atlas) {
         super(game);
+        this.index = index;
         this.gameScreen = game;
         this.ownerType = TankOwner.PLAYER;
         this.weapoon = new Weapoon(atlas);
@@ -52,9 +53,9 @@ public class PlayerTank extends Tank {
         checkMovement(dt);
 //        float mx = Gdx.input.getX();
 //        float my = Gdx.graphics.getHeight() - Gdx.input.getY();
-        temp.set(Gdx.input.getX(), Gdx.input.getY());
-        ScreenManager.getInstance().getViewport().unproject(temp);
-        rotateTurretToPoint(temp.x, temp.y, dt);
+//        temp.set(Gdx.input.getX(), Gdx.input.getY());
+//        ScreenManager.getInstance().getViewport().unproject(temp);
+        rotateTurretToPoint(gameScreen.getMousePosition().x, gameScreen.getMousePosition().y, dt);
         if (Gdx.input.isTouched()) {
             fire();
         }
@@ -66,7 +67,7 @@ public class PlayerTank extends Tank {
     }
 
     public void renderHUD(SpriteBatch batch, BitmapFont font24) {
-        font24.draw(batch, "Счет: " + score + "\nЖизни: " + lives, 50, 53);
+        font24.draw(batch, "Игрок " + gameScreen.getPlayers().size()+ " Счет: " + score + "\nЖизни: " + lives, 10 + (index - 1) * 200, 53);
     }
 
     @Override
