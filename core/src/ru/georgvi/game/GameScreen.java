@@ -1,7 +1,8 @@
 package ru.georgvi.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,16 +19,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ru.georgvi.game.units.BotTank;
 import ru.georgvi.game.units.PlayerTank;
 import ru.georgvi.game.units.Tank;
+import ru.georgvi.game.utils.GameType;
 import ru.georgvi.game.utils.KeysControl;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameScreen implements Screen {
+public class GameScreen extends AbstractScreen {
     private SpriteBatch batch;
     private TextureAtlas textureAtlas;
     private BitmapFont font24;
     private Map map;
+    private GameType gameType;
     private List<PlayerTank> players;
     private BulletEmitter bulletEmitter;
     private BotEmitter botEmitter;
@@ -37,7 +40,11 @@ public class GameScreen implements Screen {
     private boolean paused;
     private Vector2 mousePosition;
     private TextureRegion cursor;
+    private ItemEmitter itemEmitter;
     private int index;
+
+    private Sound sound;
+    private Music music;
     public static final boolean FRIENDLY_FIRE = false;
 
     public Vector2 getMousePosition() {
@@ -63,19 +70,32 @@ public class GameScreen implements Screen {
 
     public GameScreen(SpriteBatch batch) {
         this.batch = batch;
+        this.gameType = GameType.ONE_PLAYER;
     }
 
+    public void setGameType(GameType gameType) {
+        this.gameType = gameType;
+    }
 
     @Override
     public void show() {
+//        sound = Gdx.audio.newSound(Gdx.files.internal("sound_boom.wav"));
+//        sound.play();
+        music = Gdx.audio.newMusic(Gdx.files.internal("music_track.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.01f);
+        music.play();
         textureAtlas = new TextureAtlas("game.pack");
         font24 = new BitmapFont(Gdx.files.internal("font24.fnt"));
         cursor = new TextureRegion(textureAtlas.findRegion("cursor"));
         map = new Map(textureAtlas);
         players = new ArrayList<>();
-        players.add(new PlayerTank(index = 1,this, KeysControl.createStandardControlOne(), textureAtlas));
-        players.add(new PlayerTank(index = 2,this,KeysControl.createStandardControlTwo(), textureAtlas));
+        players.add(new PlayerTank(index = 1, this, KeysControl.createStandardControlOne(), textureAtlas));
+        if (gameType == GameType.TWO_PLAYERS) {
+            players.add(new PlayerTank(index = 2, this, KeysControl.createStandardControlTwo(), textureAtlas));
+        }
         bulletEmitter = new BulletEmitter(textureAtlas);
+        itemEmitter = new ItemEmitter(textureAtlas);
         botEmitter = new BotEmitter(this, textureAtlas);
 //        float coordX, coordY;
 //        do {
@@ -104,14 +124,15 @@ public class GameScreen implements Screen {
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
+                music.stop();
+                ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.MENU);
             }
         });
         pauseButton.setPosition(0, 0);
         exitButton.setPosition(200, 0);
         group.addActor(pauseButton);
         group.addActor(exitButton);
-        group.setPosition(ScreenManager.getInstance().getViewport().getScreenWidth() + 900, ScreenManager.getInstance().getViewport().getScreenHeight() + 15);
+        group.setPosition(900, 15);
         stage.addActor(group);
         Gdx.input.setInputProcessor(stage);
         Gdx.input.setCursorCatched(true);
@@ -133,6 +154,7 @@ public class GameScreen implements Screen {
         }
         botEmitter.render(batch);
         bulletEmitter.render(batch);
+        itemEmitter.render(batch);
 
         for (int i = 0; i < players.size(); i++) {
             players.get(i).renderHUD(batch, font24);
@@ -147,30 +169,6 @@ public class GameScreen implements Screen {
 
     }
 
-    @Override
-    public void resize(int width, int height) {
-        ScreenManager.getInstance().resize(width, height);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-
-    }
 
     public void updete(float dt) {
         mousePosition.set(Gdx.input.getX(), Gdx.input.getY());
@@ -194,6 +192,7 @@ public class GameScreen implements Screen {
             }
             botEmitter.update(dt);
             bulletEmitter.update(dt);
+            itemEmitter.update(dt);
             checkCollisions();
         }
         stage.act(dt);
@@ -226,6 +225,18 @@ public class GameScreen implements Screen {
 
             }
         }
+        for (int i = 0; i < itemEmitter.getItems().length; i++) {
+            if (itemEmitter.getItems()[i].isActive()) {
+                Item item = itemEmitter.getItems()[i];
+                for (int j = 0; j < players.size(); j++) {
+                    if (players.get(j).getCircle().contains(item.getPosition())) {
+                        players.get(j).consumePowerUp(item);
+                        item.deactivate();
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public boolean checkBulletAndTank(Tank tank, Bullet bullet) {
@@ -234,5 +245,15 @@ public class GameScreen implements Screen {
         } else {
             return tank != bullet.getOwner();
         }
+    }
+
+    @Override
+    public void dispose() {
+        textureAtlas.dispose();
+        font24.dispose();
+    }
+
+    public ItemEmitter getItemEmitter() {
+        return itemEmitter;
     }
 }

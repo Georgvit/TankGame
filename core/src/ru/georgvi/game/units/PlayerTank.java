@@ -1,13 +1,13 @@
 package ru.georgvi.game.units;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import ru.georgvi.game.GameScreen;
+import ru.georgvi.game.Item;
 import ru.georgvi.game.Weapoon;
 import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.KeysControl;
@@ -98,5 +98,16 @@ public class PlayerTank extends Tank {
     public void destroy() {
         lives--;
         hp = hpMax;
+    }
+
+    public void consumePowerUp(Item item) {
+        switch (item.getType()) {
+            case MEDKIT:
+                lives += 1;
+                break;
+            case SHIELD:
+                addScore(1000); // надо дописать щит или защитную функцию для этого элемента игры
+                break;
+        }
     }
 }
