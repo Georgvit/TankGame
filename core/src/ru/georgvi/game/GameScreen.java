@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import ru.georgvi.game.units.BotTank;
 import ru.georgvi.game.units.PlayerTank;
 import ru.georgvi.game.units.Tank;
+import ru.georgvi.game.utils.KeysControl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,8 +73,8 @@ public class GameScreen implements Screen {
         cursor = new TextureRegion(textureAtlas.findRegion("cursor"));
         map = new Map(textureAtlas);
         players = new ArrayList<>();
-        players.add(new PlayerTank(index = 1,this, textureAtlas));
-        players.add(new PlayerTank(index = 2,this, textureAtlas));
+        players.add(new PlayerTank(index = 1,this, KeysControl.createStandardControlOne(), textureAtlas));
+        players.add(new PlayerTank(index = 2,this,KeysControl.createStandardControlTwo(), textureAtlas));
         bulletEmitter = new BulletEmitter(textureAtlas);
         botEmitter = new BotEmitter(this, textureAtlas);
 //        float coordX, coordY;
@@ -136,6 +137,8 @@ public class GameScreen implements Screen {
         for (int i = 0; i < players.size(); i++) {
             players.get(i).renderHUD(batch, font24);
         }
+        batch.end();
+        batch.begin();
         stage.draw();
         batch.draw(cursor, mousePosition.x - 24, mousePosition.y - 24, cursor.getRegionWidth() / 2,
                 cursor.getRegionHeight() / 2, cursor.getRegionWidth(), cursor.getRegionHeight(), 1, 1, -worldTimer * 50);

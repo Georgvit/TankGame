@@ -10,7 +10,9 @@ import com.badlogic.gdx.math.Vector2;
 import ru.georgvi.game.GameScreen;
 import ru.georgvi.game.Weapoon;
 import ru.georgvi.game.utils.Direction;
+import ru.georgvi.game.utils.KeysControl;
 import ru.georgvi.game.utils.TankOwner;
+import ru.georgvi.game.utils.Utils;
 
 public class PlayerTank extends Tank {
     int index;
@@ -18,12 +20,15 @@ public class PlayerTank extends Tank {
     int score;
 
     int lives;
+    KeysControl keysControl;
+    StringBuilder tmpString;
 
-    public PlayerTank(int index, GameScreen game, TextureAtlas atlas) {
+    public PlayerTank(int index, GameScreen game, KeysControl keysControl, TextureAtlas atlas) {
         super(game);
         this.index = index;
         this.gameScreen = game;
         this.ownerType = TankOwner.PLAYER;
+        this.keysControl = keysControl;
         this.weapoon = new Weapoon(atlas);
         this.texture = atlas.findRegion("playerTankBase");
         this.textureHp = atlas.findRegion("bar");
@@ -35,16 +40,17 @@ public class PlayerTank extends Tank {
         this.hp = this.hpMax;
         this.circle = new Circle(position.x, position.y, (width + height) / 2);
         this.lives = 5;
+        this.tmpString = new StringBuilder();
     }
 
     public void checkMovement(float dt) {
-        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if (Gdx.input.isKeyPressed(keysControl.getLeft())) {
             move(Direction.LEFT, dt);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+        } else if (Gdx.input.isKeyPressed(keysControl.getRight())) {
             move(Direction.RIGTH, dt);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+        } else if (Gdx.input.isKeyPressed(keysControl.getDown())) {
             move(Direction.DOWN, dt);
-        } else if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+        } else if (Gdx.input.isKeyPressed(keysControl.getUp())) {
             move(Direction.UP, dt);
         }
     }
@@ -55,9 +61,23 @@ public class PlayerTank extends Tank {
 //        float my = Gdx.graphics.getHeight() - Gdx.input.getY();
 //        temp.set(Gdx.input.getX(), Gdx.input.getY());
 //        ScreenManager.getInstance().getViewport().unproject(temp);
-        rotateTurretToPoint(gameScreen.getMousePosition().x, gameScreen.getMousePosition().y, dt);
-        if (Gdx.input.isTouched()) {
-            fire();
+        if (keysControl.getTargeting() == KeysControl.Targeting.MOUSE) {
+            rotateTurretToPoint(gameScreen.getMousePosition().x, gameScreen.getMousePosition().y, dt);
+            if (Gdx.input.isTouched()) {
+                fire();
+            }
+        } else {
+            if (Gdx.input.isKeyPressed(keysControl.getRotateTurretLeft())) {
+                angleTurret = Utils.makeRotation(angleTurret, angleTurret + 90.0f, 270.0f, dt);
+                angleTurret = Utils.angleToFromNegPiToPosPi(angleTurret);
+            }
+            if (Gdx.input.isKeyPressed(keysControl.getRotateTurretRight())) {
+                angleTurret = Utils.makeRotation(angleTurret, angleTurret - 90.0f, 270.0f, dt);
+                angleTurret = Utils.angleToFromNegPiToPosPi(angleTurret);
+            }
+            if (Gdx.input.isKeyPressed(keysControl.getFire())) {
+                fire();
+            }
         }
         super.update(dt);
     }
@@ -67,7 +87,11 @@ public class PlayerTank extends Tank {
     }
 
     public void renderHUD(SpriteBatch batch, BitmapFont font24) {
-        font24.draw(batch, "Игрок " + gameScreen.getPlayers().size()+ " Счет: " + score + "\nЖизни: " + lives, 10 + (index - 1) * 200, 53);
+        tmpString.setLength(0);
+        tmpString.append("Игрок ").append(index);
+        tmpString.append("  Счет: ").append(score);
+        tmpString.append("\nЖизни: ").append(lives);
+        font24.draw(batch, tmpString, 10 + (index - 1) * 200, 53);
     }
 
     @Override
