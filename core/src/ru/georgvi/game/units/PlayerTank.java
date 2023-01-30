@@ -8,11 +8,9 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
 import ru.georgvi.game.GameScreen;
 import ru.georgvi.game.Item;
+import ru.georgvi.game.ScreenManager;
 import ru.georgvi.game.Weapoon;
-import ru.georgvi.game.utils.Direction;
-import ru.georgvi.game.utils.KeysControl;
-import ru.georgvi.game.utils.TankOwner;
-import ru.georgvi.game.utils.Utils;
+import ru.georgvi.game.utils.*;
 
 public class PlayerTank extends Tank {
     int index;
@@ -22,6 +20,7 @@ public class PlayerTank extends Tank {
     int lives;
     KeysControl keysControl;
     StringBuilder tmpString;
+    FinalScreen finalScreen;
 
     public PlayerTank(int index, GameScreen game, KeysControl keysControl, TextureAtlas atlas) {
         super(game);
@@ -65,6 +64,7 @@ public class PlayerTank extends Tank {
             rotateTurretToPoint(gameScreen.getMousePosition().x, gameScreen.getMousePosition().y, dt);
             if (Gdx.input.isTouched()) {
                 fire();
+
             }
         } else {
             if (Gdx.input.isKeyPressed(keysControl.getRotateTurretLeft())) {
@@ -98,6 +98,14 @@ public class PlayerTank extends Tank {
     public void destroy() {
         lives--;
         hp = hpMax;
+        if (lives <= 0){
+            ScreenManager.getInstance().chekviktori(1);
+            ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.FINALGAME);
+        }
+    }
+
+    public int getScore() {
+        return score;
     }
 
     public void consumePowerUp(Item item) {
@@ -106,7 +114,11 @@ public class PlayerTank extends Tank {
                 lives += 1;
                 break;
             case SHIELD:
-                addScore(1000); // надо дописать щит или защитную функцию для этого элемента игры
+                addScore(1000);
+                if (getScore()> 50000) {
+                    ScreenManager.getInstance().chekviktori(2);
+                    ScreenManager.getInstance().setScreen(ScreenManager.ScreenType.FINALGAME);// надо дописать щит или защитную функцию для этого элемента игры
+                }
                 break;
         }
     }

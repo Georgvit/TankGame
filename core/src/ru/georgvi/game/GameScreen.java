@@ -79,11 +79,10 @@ public class GameScreen extends AbstractScreen {
 
     @Override
     public void show() {
-//        sound = Gdx.audio.newSound(Gdx.files.internal("sound_boom.wav"));
-//        sound.play();
+        sound = Gdx.audio.newSound(Gdx.files.internal("sound_boom.wav"));
         music = Gdx.audio.newMusic(Gdx.files.internal("music_track.mp3"));
         music.setLooping(true);
-        music.setVolume(0.01f);
+        music.setVolume(0.03f);
         music.play();
         textureAtlas = new TextureAtlas("game.pack");
         font24 = new BitmapFont(Gdx.files.internal("font24.fnt"));
@@ -255,5 +254,13 @@ public class GameScreen extends AbstractScreen {
 
     public ItemEmitter getItemEmitter() {
         return itemEmitter;
+    }
+
+    public Sound getSound() {
+        return sound;
+    }
+
+    public Music getMusic() {
+        return music;
     }
 }

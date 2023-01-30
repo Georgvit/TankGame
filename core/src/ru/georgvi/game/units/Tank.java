@@ -5,11 +5,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 import ru.georgvi.game.GameScreen;
 import ru.georgvi.game.utils.Direction;
 import ru.georgvi.game.utils.TankOwner;
 import ru.georgvi.game.utils.Utils;
 import ru.georgvi.game.Weapoon;
+
+import java.sql.Time;
 
 public abstract class Tank {
     protected GameScreen gameScreen;
@@ -100,11 +103,15 @@ public abstract class Tank {
 
     public void fire() {
         if (fireTimer >= weapoon.getFirePeriod()) {
+            long id = gameScreen.getSound().play(0.5f);
+            gameScreen.getSound().setVolume(id, 0.08f);
+
             fireTimer = 0.0f;
             float angleRad = (float) Math.toRadians(angleTurret);
             float projectSpeed = 320.0f;
             gameScreen.getBulletEmitter().acvate(this, position.x, position.y, weapoon.getProjectileSpeed() * (float) Math.cos(angleRad),
                     weapoon.getProjectileSpeed() * (float) Math.sin(angleRad), weapoon.getDamage(), weapoon.getProjectileLifetime());
+
 
         }
 

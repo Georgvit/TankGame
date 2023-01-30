@@ -8,12 +8,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ru.georgvi.game.utils.FinalScreen;
 import ru.georgvi.game.utils.GameType;
 
 
 public class ScreenManager {
     public enum ScreenType {
-        MENU, GAME
+        MENU, GAME, FINALGAME
     }
 
     private static ScreenManager ourInstance = new ScreenManager();
@@ -28,6 +29,7 @@ public class ScreenManager {
     private Game game;
     private GameScreen gameScreen;
     private MenuScreen menuScreen;
+    private FinalScreen fihalScreen;
     private Viewport viewport;
     private Camera camera;
 
@@ -50,6 +52,7 @@ public class ScreenManager {
         this.viewport = new FitViewport(WORLD_WIDTH, WORLD_HEIGHT, camera);
         this.menuScreen = new MenuScreen(batch);
         this.gameScreen = new GameScreen(batch);
+        this.fihalScreen = new FinalScreen(batch);
     }
 
     public void resize(int width, int height) {
@@ -68,9 +71,18 @@ public class ScreenManager {
                 gameScreen.setGameType((GameType) args[0]);
                 game.setScreen(gameScreen);
                 break;
+            case FINALGAME:
+                game.setScreen(fihalScreen);
+                break;
         }
         if (currentScreen != null) {
             currentScreen.dispose();
         }
+    }
+
+    public void chekviktori(int variant){
+        gameScreen.getMusic().stop();
+        gameScreen.getSound().stop();
+        fihalScreen.setTemp(variant);
     }
 }
